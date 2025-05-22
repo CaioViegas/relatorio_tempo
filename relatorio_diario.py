@@ -1,0 +1,61 @@
+import os
+import requests
+import smtplib
+from email.mime.text import MIMEText
+from datetime import datetime
+
+EMAIL_REMETENTE = os.getenv("EMAIL_REMETENTE")
+SENHA_APP = os.getenv("SENHA_APP")
+EMAIL_DESTINATARIO = os.getenv("EMAIL_DESTINATARIO")
+
+LATITUDE = -22.8696
+LONGITUDE = -43.3436
+TIMEZONE = "America/Sao_Paulo"
+
+def gerar_e_enviar_relatorio():
+    url = (
+        "https://api.open-meteo.com/v1/forecast?"
+        f"latitude={LATITUDE}&longitude={LONGITUDE}"
+        f"&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,"
+        f"windspeed_10m_max,windgusts_10m_max,shortwave_radiation_sum,sunrise,sunset"
+        f"&timezone={TIMEZONE}"
+    )
+
+    response = requests.get(url)
+    data = response.json()
+
+    if "daily" not in data:
+        print("Erro: dados meteorológicos não encontrados.")
+        return
+
+    daily = data["daily"]
+    idx = 0  
+
+    relatorio = f"""
+    📍 Previsão do Tempo para Hoje ({daily['time'][idx]}):
+    ────────────────────────────────────────────
+    🌡️  Temperatura: {daily['temperature_2m_min'][idx]}°C mínima, {daily['temperature_2m_max'][idx]}°C máxima
+    🌧️  Precipitação: {daily['precipitation_sum'][idx]} mm
+    💨 Vento: {daily['windspeed_10m_max'][idx]} km/h (rajadas até {daily['windgusts_10m_max'][idx]} km/h)
+    🔆 Radiação solar: {daily['shortwave_radiation_sum'][idx]} MJ/m²
+    🌅 Nascer do sol: {datetime.fromisoformat(daily['sunrise'][idx]).strftime('%H:%M')}
+    🌇 Pôr do sol: {datetime.fromisoformat(daily['sunset'][idx]).strftime('%H:%M')}
+    """
+
+    print("📤 Enviando e-mail com o relatório do tempo...")
+
+    msg = MIMEText(relatorio, "plain", "utf-8")
+    msg["Subject"] = "📅 Relatório do Tempo - Madureira (RJ)"
+    msg["From"] = EMAIL_REMETENTE
+    msg["To"] = EMAIL_DESTINATARIO
+
+    try:
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+            smtp.login(EMAIL_REMETENTE, SENHA_APP)
+            smtp.send_message(msg)
+        print("✅ E-mail enviado com sucesso!")
+    except Exception as e:
+        print("❌ Erro ao enviar o e-mail:", e)
+
+if __name__ == '__main__':
+    gerar_e_enviar_relatorio()
