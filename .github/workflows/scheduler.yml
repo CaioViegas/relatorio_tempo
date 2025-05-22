@@ -24,4 +24,4 @@ jobs:
         CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
       run: |
-        python weather_report.py
+        python relatorio_hora.py
