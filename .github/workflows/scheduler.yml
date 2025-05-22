@@ -1,0 +1,27 @@
+name: Weather Report Telegram
+
+on:
+  schedule:
+    - cron: '0 */3 * * *'
+  workflow_dispatch:  # Permite rodar manualmente também
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+    - name: Install dependencies
+      run: |
+        pip install requests pandas python-telegram-bot
+    - name: Run weather report
+      env:
+        TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+        CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
+      run: |
+        python weather_report.py
