@@ -28,4 +28,4 @@ jobs:
           pip install python-telegram-bot requests pandas
 
       - name: Executar script de relatório
-        run: python weather_report.py
+        run: python relatorio_hora.py
