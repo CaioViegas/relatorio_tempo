@@ -69,7 +69,7 @@ def formatar_mensagem(df):
 
 async def enviar_mensagem_telegram(mensagem):
     bot = Bot(token=TOKEN)
-    await bot.send_message(chat_id=CHAT_ID, text=mensagem, parse_mode='Markdown')
+    await bot.send_message(chat_id=CHAT_ID, text=mensagem)
 
 async def main():
     try:
