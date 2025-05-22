@@ -1,27 +1,31 @@
-name: Weather Report Telegram
+name: Enviar relatório do tempo a cada 3 horas
 
 on:
   schedule:
-    - cron: '0 */3 * * *'
-  workflow_dispatch:  # Permite rodar manualmente também
+    - cron: '0 */3 * * *'  # Executa de 3 em 3 horas
+  workflow_dispatch:  # Permite execução manual também
 
 jobs:
-  run-script:
+  enviar_relatorio:
     runs-on: ubuntu-latest
+    env:
+      API_KEY: ${{ secrets.API_KEY }}
+      TOKEN: ${{ secrets.TOKEN }}
+      CHAT_ID: ${{ secrets.CHAT_ID }}
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.10'
-    - name: Install dependencies
-      run: |
-        pip install requests pandas python-telegram-bot
-    - name: Run weather report
-      env:
-        TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
-        CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
-      run: |
-        python relatorio_hora.py
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Instalar dependências
+        run: |
+          python -m pip install --upgrade pip
+          pip install python-telegram-bot requests pandas
+
+      - name: Executar script de relatório
+        run: python weather_report.py
