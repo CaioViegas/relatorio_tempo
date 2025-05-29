@@ -1,60 +1,81 @@
+import os
 import requests
 import asyncio
-import os
 import pandas as pd
 from telegram import Bot
 
+# Configurações de API e localização
 API_KEY = os.getenv("API_KEY")
 TOKEN = os.getenv("TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
 
-latitude = -22.8696
-longitude = -43.3436
+LATITUDE = -22.8696
+LONGITUDE = -43.3436
 
-URL = f"http://api.openweathermap.org/data/2.5/forecast?lat={latitude}&lon={longitude}&appid={API_KEY}&units=metric&lang=pt_br"
+URL = (
+    f"http://api.openweathermap.org/data/2.5/forecast?"
+    f"lat={LATITUDE}&lon={LONGITUDE}&appid={API_KEY}&units=metric&lang=pt_br"
+)
+
 
 def obter_previsao():
+    """
+    Obtém a previsão do tempo a partir da API OpenWeatherMap.
+    
+    Returns:
+        dict: Dados da previsão do tempo.
+    
+    Raises:
+        Exception: Se a resposta da API for inválida.
+    """
     response = requests.get(URL)
     if response.status_code == 200:
-        data = response.json()
-        return data
+        return response.json()
     else:
         raise Exception(f"Erro na API: {response.status_code}, {response.text}")
 
-def processar_dados(data):
-    previsoes = []
-    
-    for item in data['list'][:2]:  
-        dt_txt = item['dt_txt']
-        temp = item['main']['temp']
-        feels_like = item['main']['feels_like']
-        pressure = item['main']['pressure']
-        humidity = item['main']['humidity']
-        weather_main = item['weather'][0]['main']
-        weather_desc = item['weather'][0]['description']
-        wind_speed = item['wind']['speed']
-        pop = item.get('pop', 0)
-        chuva = item.get('rain', {}).get('3h', 0)
 
-        previsoes.append({
-            'Data/Hora': dt_txt,
-            'Temperatura (°C)': temp,
-            'Sensação Térmica (°C)': feels_like,
-            'Pressão (hPa)': pressure,
-            'Umidade (%)': humidity,
-            'Condição': weather_main,
-            'Descrição': weather_desc,
-            'Velocidade do Vento (m/s)': wind_speed,
-            'Probabilidade de Precipitação': pop,
-            'Chuva (mm/3h)': chuva
-        })
+def processar_dados(data):
+    """
+    Processa os dados brutos da previsão e estrutura em DataFrame.
     
-    df = pd.DataFrame(previsoes)
-    return df
+    Args:
+        data (dict): Dados brutos da previsão.
+    
+    Returns:
+        pd.DataFrame: DataFrame com as previsões estruturadas.
+    """
+    previsoes = []
+
+    for item in data['list'][:3]:  # Apenas as próximas 3 previsões
+        previsoes.append({
+            'Data/Hora': item['dt_txt'],
+            'Temperatura (°C)': item['main']['temp'],
+            'Sensação Térmica (°C)': item['main']['feels_like'],
+            'Pressão (hPa)': item['main']['pressure'],
+            'Umidade (%)': item['main']['humidity'],
+            'Condição': item['weather'][0]['main'],
+            'Descrição': item['weather'][0]['description'],
+            'Velocidade do Vento (m/s)': item['wind']['speed'],
+            'Probabilidade de Precipitação': item.get('pop', 0),
+            'Chuva (mm/3h)': item.get('rain', {}).get('3h', 0)
+        })
+
+    return pd.DataFrame(previsoes)
+
 
 def formatar_mensagem(df):
-    mensagem = f"📊 *Relatório de Previsão do Tempo - Madureira* 📊\n\n"
+    """
+    Formata a mensagem de previsão do tempo para envio no Telegram.
     
+    Args:
+        df (pd.DataFrame): DataFrame com os dados de previsão.
+    
+    Returns:
+        str: Mensagem formatada.
+    """
+    mensagem = "📊 *Relatório de Previsão do Tempo - Madureira* 📊\n\n"
+
     for _, row in df.iterrows():
         mensagem += (
             f"🕒 {row['Data/Hora']}\n"
@@ -65,13 +86,25 @@ def formatar_mensagem(df):
             f"🔴 Pressão: {row['Pressão (hPa)']} hPa\n"
             f"🌤️ Condição: {row['Condição']} - {row['Descrição']}\n\n"
         )
+    
     return mensagem
 
+
 async def enviar_mensagem_telegram(mensagem):
+    """
+    Envia uma mensagem formatada via Telegram.
+    
+    Args:
+        mensagem (str): Mensagem a ser enviada.
+    """
     bot = Bot(token=TOKEN)
-    await bot.send_message(chat_id=CHAT_ID, text=mensagem)
+    await bot.send_message(chat_id=CHAT_ID, text=mensagem, parse_mode='Markdown')
+
 
 async def main():
+    """
+    Executa a coleta, processamento, formatação e envio da previsão.
+    """
     try:
         dados = obter_previsao()
         df = processar_dados(dados)
@@ -80,6 +113,7 @@ async def main():
         print("✅ Mensagem enviada com sucesso via Telegram!")
     except Exception as e:
         print(f"❌ Erro: {e}")
+
 
 if __name__ == '__main__':
     asyncio.run(main())

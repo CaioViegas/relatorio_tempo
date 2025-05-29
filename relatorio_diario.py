@@ -4,6 +4,7 @@ import smtplib
 from email.mime.text import MIMEText
 from datetime import datetime
 
+# Configurações de e-mail e localização
 EMAIL_REMETENTE = os.getenv("EMAIL_REMETENTE")
 SENHA_APP = os.getenv("SENHA_APP")
 EMAIL_DESTINATARIO = os.getenv("EMAIL_DESTINATARIO")
@@ -12,7 +13,12 @@ LATITUDE = -22.8696
 LONGITUDE = -43.3436
 TIMEZONE = "America/Sao_Paulo"
 
+
 def gerar_e_enviar_relatorio():
+    """
+    Gera o relatório meteorológico do dia utilizando a API Open-Meteo
+    e envia o resultado por e-mail.
+    """
     url = (
         "https://api.open-meteo.com/v1/forecast?"
         f"latitude={LATITUDE}&longitude={LONGITUDE}"
@@ -25,22 +31,24 @@ def gerar_e_enviar_relatorio():
     data = response.json()
 
     if "daily" not in data:
-        print("Erro: dados meteorológicos não encontrados.")
+        print("❌ Erro: dados meteorológicos não encontrados.")
         return
 
     daily = data["daily"]
-    idx = 0  
+    idx = 0  # Índice do dia atual
 
-    relatorio = f"""
-    📍 Previsão do Tempo para Hoje ({daily['time'][idx]}):
-    ────────────────────────────────────────────
-    🌡️  Temperatura: {daily['temperature_2m_min'][idx]}°C mínima, {daily['temperature_2m_max'][idx]}°C máxima
-    🌧️  Precipitação: {daily['precipitation_sum'][idx]} mm
-    💨 Vento: {daily['windspeed_10m_max'][idx]} km/h (rajadas até {daily['windgusts_10m_max'][idx]} km/h)
-    🔆 Radiação solar: {daily['shortwave_radiation_sum'][idx]} MJ/m²
-    🌅 Nascer do sol: {datetime.fromisoformat(daily['sunrise'][idx]).strftime('%H:%M')}
-    🌇 Pôr do sol: {datetime.fromisoformat(daily['sunset'][idx]).strftime('%H:%M')}
-    """
+    relatorio = (
+        f"📍 Previsão do Tempo para Hoje ({daily['time'][idx]}):\n"
+        f"────────────────────────────────────────────\n"
+        f"🌡️  Temperatura: {daily['temperature_2m_min'][idx]}°C mínima, "
+        f"{daily['temperature_2m_max'][idx]}°C máxima\n"
+        f"🌧️  Precipitação: {daily['precipitation_sum'][idx]} mm\n"
+        f"💨 Vento: {daily['windspeed_10m_max'][idx]} km/h "
+        f"(rajadas até {daily['windgusts_10m_max'][idx]} km/h)\n"
+        f"🔆 Radiação solar: {daily['shortwave_radiation_sum'][idx]} MJ/m²\n"
+        f"🌅 Nascer do sol: {datetime.fromisoformat(daily['sunrise'][idx]).strftime('%H:%M')}\n"
+        f"🌇 Pôr do sol: {datetime.fromisoformat(daily['sunset'][idx]).strftime('%H:%M')}\n"
+    )
 
     print("📤 Enviando e-mail com o relatório do tempo...")
 
@@ -55,7 +63,8 @@ def gerar_e_enviar_relatorio():
             smtp.send_message(msg)
         print("✅ E-mail enviado com sucesso!")
     except Exception as e:
-        print("❌ Erro ao enviar o e-mail:", e)
+        print(f"❌ Erro ao enviar o e-mail: {e}")
+
 
 if __name__ == '__main__':
     gerar_e_enviar_relatorio()
