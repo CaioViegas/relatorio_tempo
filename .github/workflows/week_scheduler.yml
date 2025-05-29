@@ -2,7 +2,7 @@ name: Enviar Previsão Diária com Comparativo
 
 on:
   schedule:
-    - cron: '0 9 * * *'  
+    - cron: '0 3 * * *'  
   workflow_dispatch:
 
 jobs:
@@ -18,7 +18,7 @@ jobs:
         python-version: '3.x'
 
     - name: Instalar dependências
-      run: pip install python-dotenv matplotlib
+      run: pip install python-dotenv matplotlib requests
 
     - name: Executar script de previsão comparativa
       env:
