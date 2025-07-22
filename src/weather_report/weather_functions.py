@@ -48,7 +48,7 @@ def get_weather_data():
         "timezone": TIMEZONE
     }
 
-    response = requests.get(base_url, params=params)
+    response = requests.get(base_url, params=params, timeout=360)
     response.raise_for_status()
 
     data = response.json()
