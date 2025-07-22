@@ -31,4 +31,4 @@ jobs:
           LATITUDE: ${{ secrets.LATITUDE }}
           LONGITUDE: ${{ secrets.LONGITUDE }}
           TIMEZONE: ${{ secrets.TIMEZONE }}
-        run: python main.py
+        run: python src/weather_report/main.py
