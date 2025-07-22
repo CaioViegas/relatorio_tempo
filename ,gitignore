@@ -1,0 +1,64 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+
+# Environments
+.env
+.venv/
+venv/
+ENV/
+env/
+
+# VSCode settings
+.vscode/
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Logs and databases
+*.log
+*.sqlite3
+
+# Plotly HTML/PNG outputs - opcional, pode versionar se quiser
+comparative_graph.html
+comparative_graph.png
+weather_dashboard.html
+weather_dashboard.png
+
+# PyCharm
+.idea/
+
+# macOS system files
+.DS_Store
+
+# Windows system files
+Thumbs.db
+
+# Python virtual environments
+.env/
+venv/
+ENV/
+
+# Coverage reports
+.coverage
+htmlcov/
+coverage.xml
+
+# pytest cache
+.pytest_cache/
+
+# mypy
+.mypy_cache/
+
+# pipenv
+Pipfile.lock
