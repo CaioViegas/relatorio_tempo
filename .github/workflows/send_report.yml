@@ -28,4 +28,7 @@ jobs:
           EMAIL_REMETENTE: ${{ secrets.EMAIL_REMETENTE }}
           EMAIL_DESTINATARIO: ${{ secrets.EMAIL_DESTINATARIO }}
           SENHA_APP: ${{ secrets.SENHA_APP }}
+          LATITUDE: ${{ secrets.LATITUDE }}
+          LONGITUDE: ${{ secrets.LONGITUDE }}
+          TIMEZONE: ${{ secrets.TIMEZONE }}
         run: python main.py
