@@ -2,30 +2,25 @@ name: Enviar relatório meteorológico
 
 on:
   schedule:
-    - cron: '0 3 * * *'  
-  workflow_dispatch:     
+    - cron: '0 3 * * *' 
+  workflow_dispatch:
 
 jobs:
   run-script:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
+    container:
+      image: mcr.microsoft.com/playwright/python:v1.44.0-jammy
+
     steps:
       - name: Checkout do repositório
         uses: actions/checkout@v3
 
-      - name: Configurar Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Instalar dependências
+      - name: Atualizar pip e instalar dependências do projeto
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-
-      - name: Instalar navegadores do Playwright
-        run: playwright install --with-deps
 
       - name: Executar script principal
         env:

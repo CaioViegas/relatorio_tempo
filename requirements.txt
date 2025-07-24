@@ -1,5 +1,6 @@
 python-dotenv
 pandas
-plotly
+matplotlib
+seaborn
 requests
 playwright
