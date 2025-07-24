@@ -33,7 +33,7 @@ def generate_weather_dashboard():
             'Temperatura vs. Sensação Térmica',
             'Umidade Relativa (%)',
             'Velocidade do Vento (Km/h)',
-            'Probabilidade de Precipitação',
+            'Precipitação Total (mm)',
             'Índice UV',
             'Máxima / Mínima / Direção do Vento'
         ),
@@ -165,6 +165,12 @@ def generate_weather_dashboard():
     fig.update_yaxes(title_text='Velocidade (km/h)', row=1, col=3)
     fig.update_yaxes(title_text='Probabilidade (%)', row=2, col=1)
     fig.update_yaxes(title_text='UV Index', row=2, col=2)
+
+    fig.update_xaxes(title_text='Horário', row=1, col=1)
+    fig.update_xaxes(title_text='Horário', row=1, col=2)
+    fig.update_xaxes(title_text='Horário', row=1, col=3)
+    fig.update_xaxes(title_text='Horário', row=2, col=1)
+    fig.update_xaxes(title_text='Horário', row=2, col=2)
 
     for row in [1, 2]:
         for col in [1, 2]:
