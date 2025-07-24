@@ -1,71 +1,50 @@
 import pandas as pd
-import plotly.graph_objects as go
+import matplotlib.pyplot as plt
+import seaborn as sns
 from datetime import datetime, timedelta
 from weather_functions import get_last_year_forecast, get_historical_data, get_week_forecast
 
-def comparison_graph(df_forecast: pd.DataFrame, df_hist_1y: pd.DataFrame, df_hist_2y: pd.DataFrame, datas_fmt: pd.Series) -> go.Figure:
+def comparison_graph(df_forecast: pd.DataFrame, df_hist_1y: pd.DataFrame, df_hist_2y: pd.DataFrame, datas_fmt: pd.Series) -> None:
     """
-    Gera um gráfico interativo comparando as temperaturas mínimas e máximas
-    previstas para os próximos 7 dias com os dados históricos dos dois anos anteriores.
+    Gera um gráfico comparativo das temperaturas mínimas e máximas previstas para os próximos 7 dias
+    em relação aos dados históricos dos dois anos anteriores.
 
-    Args:
-        df_forecast (pd.DataFrame): DataFrame contendo as temperaturas mínimas e máximas previstas.
-        df_hist_1y (pd.DataFrame): DataFrame com as temperaturas mínimas e máximas do mesmo período no ano anterior.
-        df_hist_2y (pd.DataFrame): DataFrame com as temperaturas mínimas e máximas do mesmo período há dois anos.
-        datas_fmt (pd.Series): Série com as datas formatadas para o eixo X.
+    Parâmetros:
+    ----------
+    df_forecast : pd.DataFrame
+        DataFrame contendo as temperaturas previstas para o ano atual.
+    df_hist_1y : pd.DataFrame
+        DataFrame contendo as temperaturas históricas do ano passado.
+    df_hist_2y : pd.DataFrame
+        DataFrame contendo as temperaturas históricas de dois anos atrás.
+    datas_fmt : pd.Series
+        Série contendo as datas formatadas para os próximos 7 dias.
 
-    Returns:
-        go.Figure: Figura do Plotly com os dados comparativos renderizados.
-
-    Observação:
-        O gráfico também é salvo automaticamente como arquivo HTML em
-        'data/outputs/comparative_graph.html'.
+    Retorna:
+    -------
+    None
+        Esta função não retorna valor, mas salva o gráfico gerado como um arquivo PNG.
     """
-    fig = go.Figure()
+    plt.figure(figsize=(14, 6))
+    sns.set(style="whitegrid")
 
-    fig.add_trace(go.Scatter(
-        x=datas_fmt, y=df_forecast['temperature_2m_min'],
-        mode='lines+markers', name='Min - Este Ano',
-        line=dict(color='royalblue', width=2)
-    ))
-    fig.add_trace(go.Scatter(
-        x=datas_fmt, y=df_hist_1y['temperature_2m_min'],
-        mode='lines+markers', name='Min - Ano Passado',
-        line=dict(color='mediumturquoise', dash='dash')
-    ))
-    fig.add_trace(go.Scatter(
-        x=datas_fmt, y=df_hist_2y['temperature_2m_min'],
-        mode='lines+markers', name='Min - Ano Retrasado',
-        line=dict(color='seagreen', dash='dot')
-    ))
+    sns.lineplot(x=datas_fmt, y=df_forecast['temperature_2m_min'], label='Min - Este Ano', marker='o', color='royalblue')
+    sns.lineplot(x=datas_fmt, y=df_hist_1y['temperature_2m_min'], label='Min - Ano Passado', marker='o', color='mediumturquoise', linestyle='--')
+    sns.lineplot(x=datas_fmt, y=df_hist_2y['temperature_2m_min'], label='Min - Ano Retrasado', marker='o', color='seagreen', linestyle=':')
 
-    fig.add_trace(go.Scatter(
-        x=datas_fmt, y=df_forecast['temperature_2m_max'],
-        mode='lines+markers', name='Max - Este Ano',
-        line=dict(color='crimson', width=2)
-    ))
-    fig.add_trace(go.Scatter(
-        x=datas_fmt, y=df_hist_1y['temperature_2m_max'],
-        mode='lines+markers', name='Max - Ano Passado',
-        line=dict(color='darkorange', dash='dash')
-    ))
-    fig.add_trace(go.Scatter(
-        x=datas_fmt, y=df_hist_2y['temperature_2m_max'],
-        mode='lines+markers', name='Max - Ano Retrasado',
-        line=dict(color='goldenrod', dash='dot')
-    ))
+    sns.lineplot(x=datas_fmt, y=df_forecast['temperature_2m_max'], label='Max - Este Ano', marker='o', color='crimson')
+    sns.lineplot(x=datas_fmt, y=df_hist_1y['temperature_2m_max'], label='Max - Ano Passado', marker='o', color='darkorange', linestyle='--')
+    sns.lineplot(x=datas_fmt, y=df_hist_2y['temperature_2m_max'], label='Max - Ano Retrasado', marker='o', color='goldenrod', linestyle=':')
 
-    fig.update_layout(
-        title='📈 Comparação de Temperaturas (Máxima e Mínima) - Próximos 7 Dias vs Anos Anteriores',
-        xaxis_title='Data',
-        yaxis_title='Temperatura (°C)',
-        template='plotly_white',
-        height=520,
-        margin=dict(l=40, r=40, t=60, b=40),
-        legend=dict(title='Período', orientation='h', y=1.02, x=0.5, xanchor='center')
-    )
+    plt.title('Comparação de Temperaturas (Máxima e Mínima) - Próximos 7 Dias vs Anos Anteriores', fontsize=14, weight='bold')
+    plt.xlabel('Data', fontsize=12)
+    plt.ylabel('Temperatura (°C)', fontsize=12)
+    plt.xticks(rotation=0)
+    plt.legend(title='Período', loc='lower center', bbox_to_anchor=(0.5, -0.5), ncol=3)
+    plt.tight_layout()
 
-    fig.write_html("data/outputs/comparative_graph.html")
+    plt.savefig("data/outputs/comparative_graph.png", dpi=300)
+    plt.close()
 
 def comparison_main():
     """
