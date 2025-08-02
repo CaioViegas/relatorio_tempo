@@ -120,7 +120,7 @@ O projeto inclui um workflow automático (`.github/workflows/weather_report.yml`
 ### Clone o repositório:
 
 ```bash
-git clone https://github.com/seuusuario/relatorio_tempo.git
+git clone https://github.com/CaioViegas/relatorio_tempo.git
 cd relatorio_tempo
 ```
 
